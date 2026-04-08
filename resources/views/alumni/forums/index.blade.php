@@ -94,6 +94,52 @@ body::before {
     flex-shrink: 0;
 }
 
+/* ── NAV LINKS (BARU) ── */
+.topbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--mid);
+    text-decoration: none;
+    padding: 7px 13px;
+    border-radius: 50px;
+    border: 1.5px solid transparent;
+    transition: color .2s, background .2s, border-color .2s;
+    white-space: nowrap;
+}
+
+.nav-link:hover {
+    color: var(--blue);
+    background: rgba(20,85,179,.06);
+    border-color: var(--border2);
+}
+
+.nav-link.active {
+    color: var(--blue);
+    background: rgba(20,85,179,.08);
+    border-color: var(--border2);
+}
+
+.nav-link svg { flex-shrink: 0; }
+
+.nav-sep {
+    width: 1px;
+    height: 24px;
+    background: var(--border2);
+    flex-shrink: 0;
+}
+/* ── END NAV LINKS ── */
+
 .search-field {
     flex: 1;
     position: relative;
@@ -763,6 +809,11 @@ body::before {
     .sidebar { display: none; }
 }
 
+@media (max-width: 700px) {
+    .topbar-nav { display: none; }
+    .nav-sep    { display: none; }
+}
+
 @media (max-width: 600px) {
     .small-grid { grid-template-columns: 1fr; }
     .main-story h2 { font-size: 1.38rem; }
@@ -776,6 +827,32 @@ body::before {
     <div class="topbar-inner">
         <div class="brand">Forum Alumni</div>
         <div class="brand-sep"></div>
+
+        {{-- NAV LINKS (BARU) --}}
+        <nav class="topbar-nav">
+            <a href="{{ url('/') }}" class="nav-link">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+                    <path d="M9 21V12h6v9"/>
+                </svg>
+                Home
+            </a>
+            <a href="{{ route('forums.index') }}" class="nav-link {{ request()->routeIs('forums.*') ? 'active' : '' }}">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Forum
+            </a>
+            <a href="{{ route('lowongan.index') }}" class="nav-link {{ request()->routeIs('lowongan.*') ? 'active' : '' }}">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2"/>
+                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                </svg>
+                Loker
+            </a>
+        </nav>
+        <div class="nav-sep"></div>
+        {{-- END NAV LINKS --}}
 
         <form class="search-field" method="GET" action="{{ route('forums.index') }}" id="sf">
             <input type="text" name="q" value="{{ request('q') }}"
@@ -795,6 +872,21 @@ body::before {
         </div>
     </div>
 </div>
+
+{{-- ── Enter-to-search (BARU) ── --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var input = document.querySelector('#sf input[name="q"]');
+        if (input) {
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('sf').submit();
+                }
+            });
+        }
+    });
+</script>
 
 {{-- ══ CATEGORY NAV ══ --}}
 <nav class="cat-nav">

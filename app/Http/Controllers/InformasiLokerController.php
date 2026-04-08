@@ -92,4 +92,20 @@ class InformasiLokerController extends Controller
         $informasi_loker->delete();
         return redirect()->route('admin.informasi_loker.index')->with('success', 'Informasi loker berhasil dihapus.');
     }
+    public function apiShow($id)
+{
+    $loker = InformasiLoker::with('kategori')->find($id);
+
+    if (!$loker) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Data tidak ditemukan'
+        ], 404);
+    }
+
+    return response()->json([
+        'success' => true,
+        'data' => $loker
+    ]);
+}
 }
