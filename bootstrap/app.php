@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Middleware custom kamu
         $middleware->alias([
-            'Role'         => \App\Http\Middleware\Role::class,
+            'role'         => \App\Http\Middleware\role::class,
             'check.banned' => \App\Http\Middleware\CheckBanned::class,
         ]);
 
