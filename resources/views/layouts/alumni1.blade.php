@@ -119,6 +119,11 @@
       });
     });
   </script>
-
+<script>
+function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('active');
+}
+</script>
 </body>
 </html>

@@ -61,6 +61,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 
   <script src="{{asset('alumni/js/main.js')}}"></script>
-    
+    <script>
+    function toggleMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.toggle('active');
+    }
+</script>
   </body>
 </html> 
