@@ -281,7 +281,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dar
             <a href="{{ route('forums.index') }}" class="tnl {{ request()->routeIs('forums.*') ? 'active' : '' }}">Forum</a>
             <a href="{{ route('lowongan.index') }}" class="tnl {{ request()->routeIs('lowongan.*') ? 'active' : '' }}">Loker</a>
         </nav>
-        <a href="{{ route('forum.store') }}" class="btn-create">
+        <a href="{{ route('alumni.forums.dashboard') }}" class="btn-create">
             <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
             Buat Postingan
         </a>

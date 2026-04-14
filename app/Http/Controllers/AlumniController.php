@@ -18,4 +18,10 @@ class AlumniController extends Controller
 
         return back()->with('success', 'Password berhasil diubah');
     }
+    public function index()
+{
+    $users = \App\Models\User::latest()->paginate(10);
+
+    return view('admin.users.index', compact('users'));
+}
 }

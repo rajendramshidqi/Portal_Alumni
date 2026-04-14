@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\InformasiLokerApiController;
-
+use App\Http\Controllers\Api\ForumApiController;
+use App\Http\Controllers\Api\KomentarApiForumController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,5 +28,17 @@ Route::post('/loker', [InformasiLokerApiController::class, 'store']);
 Route::put('/loker/{id}', [InformasiLokerApiController::class, 'update']);
 Route::delete('/loker/{id}', [InformasiLokerApiController::class, 'destroy']);
 
+Route::get('/forums', [ForumApiController::class, 'index']);
+Route::get('/forums/trending', [ForumApiController::class, 'trending']);
+Route::get('/forums/{id}', [ForumApiController::class, 'show']);
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/forums', [ForumApiController::class, 'store']);
+});
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/forums/{id}/komentar', [KomentarApiForumController::class, 'index']);
+    Route::post('/forums/{id}/komentar', [KomentarApiForumController::class, 'store']);
+    Route::put('/komentar/{id}', [KomentarApiForumController::class, 'update']);
+    Route::delete('/komentar/{id}', [KomentarApiForumController::class, 'destroy']);
+});

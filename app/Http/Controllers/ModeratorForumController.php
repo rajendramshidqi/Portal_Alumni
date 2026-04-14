@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Forum;
@@ -10,13 +9,22 @@ class ModeratorForumController extends Controller
 {
     public function index()
     {
-        // Load forum yang pending dan eager load relasi termasuk komentar kasar
-        $forums = Forum::with(['kategori', 'user', 'komentarKasar.user'])
+        $forums = Forum::with(['kategori', 'user'])
             ->where('status', 'pending')
             ->latest()
             ->get();
 
-        return view('moderator.forums.index', compact('forums'));
+        $komentarKasarSemua = \App\Models\KomentarForum::with(['forum', 'user'])
+            ->where('is_kasar', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $disetujuiBulanIni = Forum::where('status', 'approved')
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->count();
+
+        return view('moderator.forums.index', compact('forums', 'komentarKasarSemua', 'disetujuiBulanIni'));
     }
 
     public function approve(Forum $forum)
@@ -31,14 +39,13 @@ class ModeratorForumController extends Controller
         return redirect()->back()->with('success', 'Forum berhasil di-reject.');
     }
 
-   public function destroy($id)
-{
-    $komentar = KomentarForum::findOrFail($id);
-    $komentar->delete(); // soft delete
+    public function destroy($id)
+    {
+        $komentar = KomentarForum::findOrFail($id);
+        $komentar->delete(); // soft delete
 
-    return back()->with('success', 'Komentar berhasil dihapus oleh moderator.');
-}
-
+        return back()->with('success', 'Komentar berhasil dihapus oleh moderator.');
+    }
 
     public function banUser($id)
     {

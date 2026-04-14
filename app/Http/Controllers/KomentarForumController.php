@@ -7,34 +7,51 @@ use Illuminate\Support\Facades\Auth;
 
 class KomentarForumController extends Controller
 {
-   public function store(Request $request, $forum_id)
-{
-    $request->validate([
-        'isi' => 'required|string|max:1000',
-    ]);
+    public function store(Request $request, $forum_id)
+    {
+        $request->validate([
+            'isi' => 'required|string|max:1000',
+        ]);
 
-    // Daftar kata kasar
-    $kataKasar = ['bodoh', 'goblok', 'anjing', 'babi', 'kontolll', 'bangsat','ewe','tolol'];
-    $isiKomentar = strtolower($request->isi);
-    $mengandungKasar = false;
+        // Daftar kata kasar
+        $kataKasar = ['bodoh', 'goblok', 'anjing', 'babi', 'kontol', 'bangsat', 'ewe', 'tolol','ngentod'];
 
-    foreach ($kataKasar as $kata) {
-        if (str_contains($isiKomentar, $kata)) {
-            $mengandungKasar = true;
-            break;
+        // Ambil isi komentar
+        $isiKomentar = strtolower($request->isi);
+
+        // 🔥 Normalisasi teks (hapus huruf berulang)
+        // contoh: anjinggg → anjing
+        $isiKomentar = preg_replace('/(.)\1+/', '$1', $isiKomentar);
+
+        // 🔥 Hapus karakter aneh (opsional biar lebih aman)
+        // contoh: anj!ng → anjng
+        $isiKomentar = preg_replace('/[^a-z0-9\s]/', '', $isiKomentar);
+
+        $mengandungKasar = false;
+
+        foreach ($kataKasar as $kata) {
+            // Gunakan regex biar fleksibel
+            if (preg_match("/\b{$kata}\b/", $isiKomentar)) {
+                $mengandungKasar = true;
+                break;
+            }
         }
+
+        // Simpan komentar
+        $komentar           = new KomentarForum();
+        $komentar->forum_id = $forum_id;
+        $komentar->users_id  = auth()->id();
+        $komentar->isi      = $request->isi;
+        $komentar->is_kasar = $mengandungKasar; // tandai kasar atau tidak
+        $komentar->save();
+
+        // Response
+        if ($mengandungKasar) {
+            return back()->with('warning', 'Komentar mengandung kata tidak pantas dan sedang ditinjau moderator.');
+        }
+
+        return back()->with('success', 'Komentar berhasil ditambahkan.');
     }
-
-    KomentarForum::create([
-        'forum_id' => $forum_id,
-        'users_id' => Auth::id(),
-        'isi'      => $request->isi,
-        'is_kasar' => $mengandungKasar, // <== ini tambahan penting
-    ]);
-
-    return back()->with('success', 'Komentar berhasil dikirim.');
-}
-
 
     // Tampilkan form edit komentar
     public function edit(KomentarForum $komentar)
@@ -68,49 +85,49 @@ class KomentarForumController extends Controller
     }
 
     // Hapus komentar (alumni atau moderator)
-public function destroy($id)
-{
-    $komentar = KomentarForum::withTrashed()->findOrFail($id);
+    public function destroy($id)
+    {
+        $komentar = KomentarForum::withTrashed()->findOrFail($id);
 
-    // 🔹 ALUMNI
-    if (Auth::user()->hasRole('alumni')) {
+        // 🔹 ALUMNI
+        if (Auth::user()->hasRole('alumni')) {
 
-        // alumni hanya boleh hapus komentar sendiri
-        if (Auth::id() !== $komentar->users_id) {
-            abort(403);
+            // alumni hanya boleh hapus komentar sendiri
+            if (Auth::id() !== $komentar->users_id) {
+                abort(403);
+            }
+
+            // HARD DELETE (langsung hilang dari DB)
+            $komentar->forceDelete();
+
+            return back()->with('success', 'Komentar berhasil dihapus.');
         }
 
-        // HARD DELETE (langsung hilang dari DB)
-        $komentar->forceDelete();
+        // 🔹 MODERATOR
+        if (Auth::user()->hasRole('moderator')) {
 
-        return back()->with('success', 'Komentar berhasil dihapus.');
-    }
+            // SOFT DELETE
+            if (! $komentar->trashed()) {
+                $komentar->delete();
+            }
 
-    // 🔹 MODERATOR
-    if (Auth::user()->hasRole('moderator')) {
-
-        // SOFT DELETE
-        if (!$komentar->trashed()) {
-            $komentar->delete();
+            return back()->with('success', 'Komentar dihapus oleh moderator.');
         }
 
-        return back()->with('success', 'Komentar dihapus oleh moderator.');
+        abort(403);
     }
-
-    abort(403);
-}
 
     public function read($id)
-{
-    $komentar = KomentarForum::with('forum')->findOrFail($id);
+    {
+        $komentar = KomentarForum::with('forum')->findOrFail($id);
 
-    // Hanya pemilik forum yang bisa baca notifikasi
-    if ($komentar->forum->users_id == auth()->id()) {
-        $komentar->is_read = true;
-        $komentar->save();
+        // Hanya pemilik forum yang bisa baca notifikasi
+        if ($komentar->forum->users_id == auth()->id()) {
+            $komentar->is_read = true;
+            $komentar->save();
+        }
+
+        return redirect()->route('forum.show', $komentar->forum_id) . '#komentar-' . $komentar->id;
     }
-
-    return redirect()->route('forum.show', $komentar->forum_id) . '#komentar-' . $komentar->id;
-}
 
 }
