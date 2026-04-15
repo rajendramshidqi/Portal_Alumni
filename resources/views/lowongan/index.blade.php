@@ -295,145 +295,183 @@
     /* ═══════════════════════════════
        MAIN CONTENT
     ═══════════════════════════════ */
-    .main-wrap {
-        max-width: 1200px;
-        margin: 36px auto;
-        padding: 0 24px;
-        display: grid;
-        grid-template-columns: 1fr 300px;
-        gap: 28px;
-    }
+ .main-wrap {
+    max-width: 1200px;
+    margin: 36px auto;
+    padding: 0 16px;
+}
 
-    /* ── Section header ── */
-    .section-header {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        margin-bottom: 22px;
-    }
+/* ===============================
+   HEADER SECTION
+================================ */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
-    .section-title {
-        font-family: 'Sora', sans-serif;
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--dark);
-    }
+.section-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
 
-    .section-count {
-        font-size: .82rem;
-        color: var(--muted);
-        font-weight: 500;
-    }
+.section-count {
+    font-size: .9rem;
+    color: var(--muted);
+}
 
-    /* ── Job cards grid ── */
+/* ===============================
+   GRID LOKER (FIX RAPI)
+================================ */
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* FIX 3 */
+    gap: 20px;
+}
+
+/* ===============================
+   CARD LOKER
+================================ */
+.job-card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: all .25s ease;
+}
+
+.job-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    border-color: var(--blue2);
+}
+
+/* IMAGE */
+.job-card-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.job-card-img-placeholder {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--grad-soft);
+    font-size: 2.5rem;
+}
+
+/* BODY */
+.job-card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* BADGE */
+.job-badge {
+    background: var(--grad);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    width: fit-content;
+}
+
+/* TITLE */
+.job-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+/* META */
+.job-meta {
+    font-size: 0.85rem;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 12px;
+}
+
+.salary {
+    color: var(--success);
+    font-weight: 600;
+}
+
+/* BUTTON */
+.job-btn {
+    margin-top: auto;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: .2s;
+}
+
+.job-btn-primary {
+    background: var(--grad);
+    color: #fff;
+}
+
+.job-btn-primary:hover {
+    opacity: 0.85;
+}
+
+.job-btn-outline {
+    border: 1px solid var(--blue);
+    color: var(--blue);
+}
+
+.job-btn-outline:hover {
+    background: var(--grad-soft);
+}
+
+/* EMPTY */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 50px;
+    color: var(--muted);
+}
+
+/* PAGINATION */
+.pagination-wrap {
+    margin-top: 30px;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+/* Tablet */
+@media (max-width: 992px) {
     .jobs-grid {
-        display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 18px;
+    }
+}
+
+/* HP */
+@media (max-width: 576px) {
+    .jobs-grid {
+        grid-template-columns: 1fr;
     }
 
-    .job-card {
-        background: var(--card-bg);
-        border-radius: 14px;
-        border: 1px solid var(--border);
-        overflow: hidden;
-        transition: transform .22s, box-shadow .22s, border-color .22s;
-        display: flex;
-        flex-direction: column;
+    .main-wrap {
+        padding: 0 12px;
     }
-
-    .job-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 32px rgba(21,101,192,.13);
-        border-color: var(--blue2);
-    }
-
-    .job-card-img {
-        width: 100%;
-        height: 148px;
-        object-fit: cover;
-        display: block;
-    }
-
-    .job-card-img-placeholder {
-        height: 148px;
-        background: linear-gradient(135deg, #c5d8f5 0%, #ddeeff 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.4rem;
-    }
-
-    .job-card-body {
-        padding: 14px 16px 16px;
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-    }
-
-    .job-badge {
-        display: inline-block;
-        background: linear-gradient(90deg, #1565c0, #0288d1);
-        color: #fff;
-        font-size: .68rem;
-        font-weight: 700;
-        letter-spacing: .06em;
-        text-transform: uppercase;
-        padding: 3px 10px;
-        border-radius: 4px;
-        margin-bottom: 9px;
-        align-self: flex-start;
-    }
-
-    .job-title {
-        font-family: 'Sora', sans-serif;
-        font-size: .96rem;
-        font-weight: 700;
-        line-height: 1.35;
-        color: var(--dark);
-        margin-bottom: 8px;
-    }
-
-    .job-meta {
-        font-size: .78rem;
-        color: var(--muted);
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        margin-bottom: 12px;
-    }
-
-    .job-meta span { display: flex; align-items: center; gap: 5px; }
-
-    .job-meta .salary { color: var(--success); font-weight: 600; }
-
-    .job-btn {
-        margin-top: auto;
-        display: block;
-        text-align: center;
-        padding: 9px 14px;
-        border-radius: 8px;
-        font-size: .84rem;
-        font-weight: 600;
-        text-decoration: none;
-        transition: .2s;
-    }
-
-    .job-btn-primary {
-        background: var(--grad);
-        color: #fff;
-        box-shadow: 0 3px 12px rgba(21,101,192,.25);
-    }
-
-    .job-btn-primary:hover { opacity: .88; }
-
-    .job-btn-outline {
-        background: transparent;
-        color: var(--blue);
-        border: 1.5px solid var(--blue);
-    }
-
-    .job-btn-outline:hover { background: var(--grad-soft); }
+}
 
     /* empty state */
     .empty-state {

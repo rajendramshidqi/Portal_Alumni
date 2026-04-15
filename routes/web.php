@@ -18,6 +18,8 @@ Route::get('/', [WelcomeController::class, 'showApprovedOnWelcome'])->name('welc
 
 Auth::routes();
 
+Route::post('/update-foto', [AlumniController::class, 'updateFoto'])->name('alumni.update-foto');
+
 Route::middleware(['auth', 'check.banned'])->group(function () {
     // Semua route yang perlu user tidak banned
 });

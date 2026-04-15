@@ -9,50 +9,76 @@ class KomentarForumController extends Controller
 {
     public function store(Request $request, $forum_id)
     {
+        // 🚫 CEK USER BANNED
+        if (auth()->user()->status == 'banned') {
+            return back()->with('error', '🚫 Akun Anda telah dibanned dan tidak dapat mengirim komentar.');
+        }
+
         $request->validate([
             'isi' => 'required|string|max:1000',
         ]);
 
         // Daftar kata kasar
-        $kataKasar = ['bodoh', 'goblok', 'anjing', 'babi', 'kontol', 'bangsat', 'ewe', 'tolol','ngentod'];
+        $kataKasar = ['bodoh', 'goblok', 'anjing', 'babi', 'kontol', 'bangsat', 'ewe', 'tolol', 'ngentod'];
 
-        // Ambil isi komentar
         $isiKomentar = strtolower($request->isi);
 
-        // 🔥 Normalisasi teks (hapus huruf berulang)
-        // contoh: anjinggg → anjing
+        // Normalisasi huruf berulang
         $isiKomentar = preg_replace('/(.)\1+/', '$1', $isiKomentar);
 
-        // 🔥 Hapus karakter aneh (opsional biar lebih aman)
-        // contoh: anj!ng → anjng
+        // Hapus karakter aneh
         $isiKomentar = preg_replace('/[^a-z0-9\s]/', '', $isiKomentar);
 
         $mengandungKasar = false;
 
         foreach ($kataKasar as $kata) {
-            // Gunakan regex biar fleksibel
             if (preg_match("/\b{$kata}\b/", $isiKomentar)) {
                 $mengandungKasar = true;
                 break;
             }
         }
 
-        // Simpan komentar
+        // 🔥 AMBIL USER
+        $user = auth()->user();
+
+        // 🔥 JIKA KASAR → TAMBAH WARNING
+        if ($mengandungKasar) {
+
+            $user->warning_count += 1;
+
+            // AUTO BANNED JIKA 3x
+            if ($user->warning_count >= 3) {
+                $user->status = 'banned';
+            }
+
+            $user->save();
+        }
+
+        // SIMPAN KOMENTAR
         $komentar           = new KomentarForum();
         $komentar->forum_id = $forum_id;
-        $komentar->users_id  = auth()->id();
+        $komentar->users_id = $user->id;
         $komentar->isi      = $request->isi;
-        $komentar->is_kasar = $mengandungKasar; // tandai kasar atau tidak
+        $komentar->is_kasar = $mengandungKasar;
         $komentar->save();
 
-        // Response
+        // RESPONSE
         if ($mengandungKasar) {
-            return back()->with('warning', 'Komentar mengandung kata tidak pantas dan sedang ditinjau moderator.');
+
+            // Kalau langsung kena banned
+            if ($user->status == 'banned') {
+                return back()->with('error',
+                    '🚫 Anda telah dibanned karena terlalu banyak pelanggaran!'
+                );
+            }
+
+            return back()->with('warning',
+                '⚠️ Komentar mengandung kata kasar! Peringatan ke-' . $user->warning_count
+            );
         }
 
         return back()->with('success', 'Komentar berhasil ditambahkan.');
     }
-
     // Tampilkan form edit komentar
     public function edit(KomentarForum $komentar)
     {

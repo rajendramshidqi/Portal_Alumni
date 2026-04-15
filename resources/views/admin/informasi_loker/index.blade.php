@@ -1,87 +1,154 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="container py-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold">Daftar Informasi Loker</h2>
-            <a href="{{ route('admin.informasi_loker.create') }}" class="btn btn-primary btn-lg shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> Tambah Loker
-            </a>
+<div class="container py-4">
+
+    {{-- HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0">💼 Informasi Lowongan</h3>
+            <small class="text-muted">Kelola data lowongan pekerjaan alumni</small>
         </div>
 
-        @if (session('success'))
-            <div class="alert alert-success shadow-sm">
-                {{ session('success') }}
+        <a href="{{ route('admin.informasi_loker.create') }}"
+            class="btn btn-primary rounded-pill px-4 shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Tambah
+        </a>
+    </div>
+
+    {{-- ALERT --}}
+    @if (session('success'))
+        <div class="alert alert-success shadow-sm rounded-3">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    {{-- CARD --}}
+    <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+
+                    {{-- TABLE HEADER --}}
+                    <thead class="table-light">
+                        <tr class="text-secondary">
+                            <th class="ps-4">Foto</th>
+                            <th>Judul</th>
+                            <th>Kategori</th>
+                            <th>Lokasi</th>
+                            <th>Gaji</th>
+                            <th>Persyaratan</th>
+                            <th class="text-center pe-4">Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($informasi_lokers as $loker)
+                            <tr class="hover-row">
+
+                                {{-- FOTO --}}
+                                <td class="ps-4">
+                                    @if ($loker->foto)
+                                        <img src="{{ asset('storage/' . $loker->foto) }}"
+                                            class="rounded-3 shadow-sm"
+                                            style="width:65px; height:65px; object-fit:cover;">
+                                    @else
+                                        <div class="bg-light rounded-3 d-flex align-items-center justify-content-center"
+                                            style="width:65px; height:65px;">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                    @endif
+                                </td>
+
+                                {{-- JUDUL --}}
+                                <td>
+                                    <div class="fw-semibold">{{ $loker->judul }}</div>
+                                </td>
+
+                                {{-- KATEGORI --}}
+                                <td>
+                                    <span class="badge bg-info-subtle text-info fw-semibold px-3 py-2 rounded-pill">
+                                        {{ $loker->kategori->nama ?? '-' }}
+                                    </span>
+                                </td>
+
+                                {{-- LOKASI --}}
+                                <td>
+                                    <i class="bi bi-geo-alt text-danger me-1"></i>
+                                    {{ $loker->lokasi }}
+                                </td>
+
+                                {{-- GAJI --}}
+                                <td>
+                                    @if (!empty($loker->gaji))
+                                        <span class="badge bg-success-subtle text-success fw-semibold px-3 py-2 rounded-pill">
+                                            Rp {{ number_format((int) $loker->gaji, 0, ',', '.') }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+
+                                {{-- PERSYARATAN --}}
+                                <td style="max-width: 250px;">
+                                    <small class="text-muted">
+                                        {{ Str::limit(strip_tags($loker->persyaratan), 80) }}
+                                    </small>
+                                </td>
+
+                                {{-- AKSI --}}
+                                <td class="text-center pe-4">
+                                    <a href="{{ route('admin.informasi_loker.edit', $loker->id) }}"
+                                        class="btn btn-sm btn-warning rounded-pill px-3 me-1 shadow-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    <form action="{{ route('admin.informasi_loker.destroy', $loker->id) }}"
+                                        method="POST" class="d-inline"
+                                        onsubmit="return confirm('Yakin ingin menghapus?')">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit"
+                                            class="btn btn-sm btn-danger rounded-pill px-3 shadow-sm">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+
+                            </tr>
+
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-briefcase fs-1 mb-2 d-block"></i>
+                                        Belum ada lowongan pekerjaan
+                                    </div>
+
+                                    <a href="{{ route('admin.informasi_loker.create') }}"
+                                        class="btn btn-outline-primary mt-3 rounded-pill px-4">
+                                        Tambah Sekarang
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+
+                </table>
             </div>
-        @endif
 
-        <div class="table-responsive shadow-sm rounded">
-            <table class="table table-striped table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Foto</th>
-                        <th>Judul</th>
-                        <th>Kategori</th>
-                        <th>Lokasi</th>
-                        <th>Gaji</th>
-                        <th>Persyaratan</th>
-                        <th class="text-center">Aksi</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @forelse($informasi_lokers as $loker)
-                        <tr>
-                            {{-- FOTO --}}
-                            <td>
-                                @if ($loker->foto)
-                                    <img src="{{ asset('storage/' . $loker->foto) }}" class="rounded shadow-sm"
-                                        style="width:70px; height:70px; object-fit:cover;">
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
-                            </td>
-
-                            <td>{{ $loker->judul }}</td>
-                            <td>{{ $loker->kategori->nama ?? '-' }}</td>
-                            <td>{{ $loker->lokasi }}</td>
-
-                            <td>
-                                @if (!empty($loker->gaji))
-                                    Rp {{ number_format((int) $loker->gaji, 0, ',', '.') }}
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
-                            </td>
-
-                            <td>{{ Str::limit(strip_tags($loker->persyaratan), 100) }}</td>
-
-                            <td class="text-center">
-                                <a href="{{ route('admin.informasi_loker.edit', $loker->id) }}"
-                                    class="btn btn-outline-warning btn-sm me-1 shadow-sm">
-                                    <i class="bi bi-pencil-square me-1"></i> Edit
-                                </a>
-
-                                <form action="{{ route('admin.informasi_loker.destroy', $loker->id) }}" method="POST"
-                                    class="d-inline" onsubmit="return confirm('Yakin ingin menghapus?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger btn-sm shadow-sm">
-                                        <i class="bi bi-trash me-1"></i> Hapus
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center text-muted">
-                                Belum ada lowongan pekerjaan yang tersedia.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
         </div>
     </div>
+</div>
+
+{{-- STYLE TAMBAHAN --}}
+<style>
+.hover-row:hover {
+    background-color: #f8fafc;
+    transition: 0.2s;
+}
+</style>
+
 @endsection

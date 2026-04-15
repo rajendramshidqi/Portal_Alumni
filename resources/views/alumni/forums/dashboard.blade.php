@@ -159,6 +159,15 @@
                                         <div class="forum-action-icon">
                                             <i class="fas fa-arrow-right"></i>
                                         </div>
+                                        <div class="status-floating {{ $forum->status_class }}">
+                                            @if ($forum->status == 'approved')
+                                                ✔ Approved
+                                            @elseif($forum->status == 'pending')
+                                                ⏳ Pending
+                                            @else
+                                                ❌ Rejected
+                                            @endif
+                                        </div>
                                     </div>
                                 </a>
                             @endforeach
@@ -183,7 +192,7 @@
         </div>
     </div>
 
-   
+
     <style>
         :root {
             --color-primary: #1e40af;
@@ -205,6 +214,59 @@
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
+        }
+
+        /* BASE */
+        .status-floating {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 0.7rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            z-index: 10;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(6px);
+        }
+
+        /* ================= APPROVED (🔥 PREMIUM) ================= */
+        .status-approved {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow:
+                0 0 0 2px rgba(34, 197, 94, 0.2),
+                0 8px 20px rgba(34, 197, 94, 0.35);
+            animation: glowApproved 2s infinite alternate;
+        }
+
+        /* ANIMATION GLOW */
+        @keyframes glowApproved {
+            from {
+                box-shadow:
+                    0 0 0 2px rgba(34, 197, 94, 0.2),
+                    0 8px 20px rgba(34, 197, 94, 0.35);
+            }
+
+            to {
+                box-shadow:
+                    0 0 0 4px rgba(34, 197, 94, 0.35),
+                    0 12px 25px rgba(34, 197, 94, 0.5);
+            }
+        }
+
+        /* ================= PENDING ================= */
+        .status-pending {
+            background: linear-gradient(135deg, #facc15, #eab308);
+            color: #78350f;
+            box-shadow: 0 4px 10px rgba(250, 204, 21, 0.3);
+        }
+
+        /* ================= REJECTED ================= */
+        .status-rejected {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
         }
 
         .page-wrapper {

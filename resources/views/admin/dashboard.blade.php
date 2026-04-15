@@ -2,82 +2,155 @@
 
 @section('content')
 
-<div class="page-breadcrumb">
-    <div class="row">
-        <div class="col-12 d-flex no-block align-items-center">
-            <h4 class="page-title">Dashboard Admin</h4>
-            <div class="ml-auto text-right">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Dashboard</li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
-    </div>
-</div>
+<style>
+    .card-modern {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+        transition: 0.3s;
+    }
+
+    .card-modern:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    }
+
+    .stat-card {
+        padding: 20px;
+        border-radius: 16px;
+        color: #fff;
+    }
+
+    .bg-gradient-1 {
+        background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    }
+
+    .bg-gradient-2 {
+        background: linear-gradient(135deg, #22c55e, #4ade80);
+    }
+
+    .bg-gradient-3 {
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    }
+
+    .list-modern li {
+        border: none;
+        border-bottom: 1px solid #eee;
+    }
+
+    .list-modern li:last-child {
+        border-bottom: none;
+    }
+</style>
 
 <div class="container-fluid">
 
-    <!-- CARD STATISTIK -->
+    <!-- ALERT -->
+    @if ($komentarKasar > 0)
+        <div class="alert alert-danger shadow-sm rounded-3">
+            ⚠️ Ada <b>{{ $komentarKasar }}</b> komentar kasar!
+        </div>
+    @endif
+
+    <!-- STATISTIK -->
     <div class="row">
 
-        <!-- FORUM -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-hover shadow">
-                <div class="box bg-cyan text-center p-4">
-                    <h1 class="font-light text-white">
-                        <i class="mdi mdi-forum"></i><br>
-                        {{ $jumlahForum }}
-                    </h1>
-                    <h6 class="text-white mt-2">Total Forum</h6>
-                </div>
+        <div class="col-md-4 mb-3">
+            <div class="card-modern stat-card bg-gradient-1 text-center">
+                <h2>{{ $jumlahForum }}</h2>
+                <p>Total Forum</p>
             </div>
         </div>
 
-        <!-- LOKER -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-hover shadow">
-                <div class="box bg-success text-center p-4">
-                    <h1 class="font-light text-white">
-                        <i class="mdi mdi-briefcase"></i><br>
-                        {{ $jumlahLoker }}
-                    </h1>
-                    <h6 class="text-white mt-2">Total Lowongan Kerja</h6>
-                </div>
+        <div class="col-md-4 mb-3">
+            <div class="card-modern stat-card bg-gradient-2 text-center">
+                <h2>{{ $jumlahLoker }}</h2>
+                <p>Total Loker</p>
             </div>
         </div>
 
-        <!-- KOMENTAR -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-hover shadow">
-                <div class="box bg-warning text-center p-4">
-                    <h1 class="font-light text-white">
-                        <i class="mdi mdi-comment"></i><br>
-                        {{ $jumlahKomentar }}
-                    </h1>
-                    <h6 class="text-white mt-2">Total Komentar</h6>
-                </div>
+        <div class="col-md-4 mb-3">
+            <div class="card-modern stat-card bg-gradient-3 text-center">
+                <h2>{{ $jumlahKomentar }}</h2>
+                <p>Total Komentar</p>
             </div>
         </div>
 
     </div>
 
-    <!-- OPTIONAL: INFO TAMBAHAN -->
-    <div class="row mt-4">
+    <!-- GRAFIK -->
+    <div class="row mt-3">
         <div class="col-12">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Selamat Datang 👋</h5>
-                    <p class="card-text">
-                        Ini adalah dashboard admin untuk memantau data forum, lowongan kerja, dan aktivitas komentar alumni.
-                    </p>
-                </div>
+            <div class="card-modern p-4">
+                <h5 class="mb-3">📊 Grafik Aktivitas</h5>
+                <canvas id="chartBulanan"></canvas>
             </div>
         </div>
+    </div>
+
+    <!-- AKTIVITAS -->
+    <div class="row mt-4">
+
+        <div class="col-md-6 mb-3">
+            <div class="card-modern p-3">
+                <h5>Komentar Terbaru</h5>
+                <ul class="list-group list-modern">
+                    @foreach ($komentarTerbaru as $k)
+                        <li class="list-group-item">
+                            {{ $k->isi }}
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card-modern p-3">
+                <h5>Forum Terbaru</h5>
+
+                @foreach ($forumTerbaru as $f)
+                    <div class="mb-2 p-2 rounded" style="background:#f9fafb;">
+                        <strong>{{ $f->judul }}</strong><br>
+                        <small class="text-muted">
+                            {{ $f->created_at->diffForHumans() }}
+                        </small>
+                    </div>
+                @endforeach
+
+            </div>
+        </div>
+
     </div>
 
 </div>
+
+<!-- CHART -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const forumData = @json(array_values($forumBulanan->toArray()));
+    const komentarData = @json(array_values($komentarBulanan->toArray()));
+
+    new Chart(document.getElementById('chartBulanan'), {
+        type: 'line',
+        data: {
+            labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
+            datasets: [
+                {
+                    label: 'Forum',
+                    data: forumData,
+                    borderColor: '#3b82f6',
+                    tension: 0.4
+                },
+                {
+                    label: 'Komentar',
+                    data: komentarData,
+                    borderColor: '#f59e0b',
+                    tension: 0.4
+                }
+            ]
+        }
+    });
+</script>
 
 @endsection

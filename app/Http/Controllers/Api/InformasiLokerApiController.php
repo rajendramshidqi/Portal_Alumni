@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class InformasiLokerApiController extends Controller
 {
-    // ✅ GET semua loker
+   
     public function index()
     {
         $lokers = InformasiLoker::with('kategori')->latest()->paginate(10);
@@ -19,7 +19,7 @@ class InformasiLokerApiController extends Controller
         ]);
     }
 
-    // ✅ DETAIL
+  
     public function show($id)
     {
         $loker = InformasiLoker::with('kategori')->find($id);
@@ -37,7 +37,7 @@ class InformasiLokerApiController extends Controller
         ]);
     }
 
-    // ✅ TAMBAH (POST)
+    
     public function store(Request $request)
     {
         $request->validate([

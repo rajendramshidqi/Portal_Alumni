@@ -21,12 +21,12 @@ class ForumApiController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('judul', 'like', "%$search%")
                     ->orWhere('isi', 'like', "%$search%")
-                    ->orWhereHas('kategori', function ($k) use ($search) {
-                        $k->where('nama', 'like', "%$search%");
-                    })
-                    ->orWhereHas('user', function ($u) use ($search) {
-                        $u->where('name', 'like', "%$search%");
-                    });
+                    ->orWhereHas('kategori', fn($k) =>
+                        $k->where('nama', 'like', "%$search%")
+                    )
+                    ->orWhereHas('user', fn($u) =>
+                        $u->where('name', 'like', "%$search%")
+                    );
             });
         }
 
@@ -39,14 +39,17 @@ class ForumApiController extends Controller
 
         return response()->json([
             'success' => true,
-            'data'    => $forums,
+            'data'    => $forums->items(), // 🔥 FIX: langsung array
+            'meta'    => [
+                'current_page' => $forums->currentPage(),
+                'last_page'    => $forums->lastPage(),
+                'total'        => $forums->total(),
+            ],
         ]);
     }
-
     // 🔥 GET: Detail forum + komentar
     public function show($id)
     {
-        
 
         $komentar = KomentarForum::with('user')
             ->where('forum_id', $id)
@@ -56,7 +59,7 @@ class ForumApiController extends Controller
 
         return response()->json([
             'success'  => true,
-            
+
             'komentar' => $komentar,
         ]);
     }
@@ -104,6 +107,18 @@ class ForumApiController extends Controller
         return response()->json([
             'success' => true,
             'data'    => $trending,
+        ]);
+    }
+    public function pending()
+    {
+        $forums = Forum::with(['user', 'kategori'])
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $forums,
         ]);
     }
 }
