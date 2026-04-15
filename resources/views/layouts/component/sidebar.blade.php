@@ -27,7 +27,7 @@
                 {{-- USER --}}
                 <li class="sidebar-item">
                     <a class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
-                        href="{{route('admin.users.index')}}">
+                        href="{{route('users.index')}}">
                         <i class="mdi mdi-account-group-outline"></i>
                         <span class="hide-menu">Daftar User</span>
                     </a>
