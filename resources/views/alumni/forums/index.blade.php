@@ -466,17 +466,7 @@ document.addEventListener('DOMContentLoaded',function(){var i=document.querySele
             </div>
         </div>
 
-        <div class="sbox">
-            <div class="sbox-hd"><div class="hd-pip"></div> Kategori</div>
-            <div style="padding:3px 0;">
-                @foreach ($forums->pluck('kategori')->unique('id') as $k)
-                    <a href="{{ route('forums.index', ['kategori' => $k->id]) }}" class="kat-row">
-                        {{ $k->nama }}
-                        <span class="kat-badge">{{ $forums->where('kategori_id', $k->id)->count() }}</span>
-                    </a>
-                @endforeach
-            </div>
-        </div>
+    
 
     </aside>
 

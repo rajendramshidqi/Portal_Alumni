@@ -37,8 +37,9 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/forums/{id}/komentar', [KomentarApiForumController::class, 'index']);
-    Route::post('/forums/{id}/komentar', [KomentarApiForumController::class, 'store']);
+ Route::get('/forums/{forum_id}/komentar', [KomentarApiForumController::class, 'index']);
+Route::post('/forums/{forum_id}/komentar', [KomentarApiForumController::class, 'store']);
+
     Route::put('/komentar/{id}', [KomentarApiForumController::class, 'update']);
     Route::delete('/komentar/{id}', [KomentarApiForumController::class, 'destroy']);
 });
